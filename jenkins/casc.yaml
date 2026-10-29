@@ -1,0 +1,79 @@
+# Jenkins of Alisher Askarov (IT2-2304, ID 38226) - Configuration as Code
+jenkins:
+  systemMessage: "DevOps midterm - Jenkins of Alisher Askarov (IT2-2304, ID 38226)"
+  numExecutors: 2
+  # the built-in node has the Docker CLI: it is the Docker-capable agent
+  labelString: "docker"
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "${JENKINS_ADMIN_ID}"
+          name: "Alisher Askarov"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+# SSH key for GitHub, read from a Docker secret (the key itself is not in Git)
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - basicSSHUserPrivateKey:
+              scope: GLOBAL
+              id: "askarov-github-deploy-key"
+              username: "git"
+              description: "GitHub deploy key - AskallOff/askarov_alisher_student_api"
+              privateKeySource:
+                directEntry:
+                  privateKey: "${readFile:/run/secrets/github_deploy_key}"
+
+# Jenkins trusts only the real host key of github.com
+security:
+  gitHostKeyVerificationConfiguration:
+    sshHostKeyVerificationStrategy:
+      manuallyProvidedKeyVerificationStrategy:
+        approvedHostKeys: "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl"
+
+tool:
+  jdk:
+    installations:
+      - name: "jdk21"
+        home: "/opt/java/openjdk"
+
+unclassified:
+  location:
+    url: "http://localhost:8091/"
+
+jobs:
+  - script: |
+      pipelineJob('Askarov_Alisher_Student_API') {
+        description('Student API of Alisher Askarov: Checkout - Build - Test - Docker Build - Verify')
+        parameters {
+          stringParam('BRANCH', 'main', 'Branch of askarov_alisher_student_api to build')
+        }
+        properties {
+          pipelineTriggers {
+            triggers {
+              pollSCM { scmpoll_spec('H/2 * * * *') }
+            }
+          }
+        }
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('git@github.com:AskallOff/askarov_alisher_student_api.git')
+                  credentials('askarov-github-deploy-key')
+                }
+                branch('*/main')
+              }
+            }
+            scriptPath('Jenkinsfile')
+            // full checkout of main: polling always watches main
+            lightweight(false)
+          }
+        }
+      }

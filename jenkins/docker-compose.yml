@@ -1,0 +1,33 @@
+# Local Jenkins of Alisher Askarov
+#   cd jenkins && cp .env.example .env && docker compose up -d --build
+#   http://localhost:8091  (login and password from jenkins/.env)
+name: askarov-alisher-jenkins
+
+services:
+  jenkins:
+    build: .
+    image: askarov-alisher-jenkins:lts-jdk21
+    container_name: askarov-alisher-jenkins
+    # root can use the mounted docker.sock (local study setup only)
+    user: root
+    ports:
+      - "127.0.0.1:8091:8080"
+    env_file: .env
+    environment:
+      # Gradle downloads stay in the Jenkins volume between builds
+      GRADLE_USER_HOME: /var/jenkins_home/.gradle
+    secrets:
+      - github_deploy_key
+    volumes:
+      - jenkins-home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+# the private deploy key is mounted as /run/secrets/github_deploy_key
+secrets:
+  github_deploy_key:
+    file: ${HOME}/.ssh/askarov_alisher_deploy_ed25519
+
+volumes:
+  jenkins-home:
+    name: askarov-alisher-jenkins-home
