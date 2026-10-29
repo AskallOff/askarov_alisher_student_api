@@ -1,0 +1,17 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ IDEA / VS Code
+.idea/
+*.iml
+out/
+.vscode/
+
+# Passwords and other local settings - never commit them
+.env
+*.env.local
+
+# Logs of the running application (the system report log is committed on purpose)
+*.log
+!logs/Askarov_Alisher_system_report.log

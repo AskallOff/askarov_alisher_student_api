@@ -1,0 +1,28 @@
+####################################################
+# System report: Alisher Askarov
+####################################################
+Full name : Alisher Askarov (group IT2-2304, ID 38226)
+Date/time : 30.10.2026 00:59:25
+Username  : askarov
+Hostname  : askarov-devops
+OS        : Ubuntu 26.04.1 LTS
+Kernel    : 6.6.87.2-microsoft-standard-WSL2
+
+[CPU]
+Model     : Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz
+Cores     : 8
+Load avg  : 0.80 0.25 0.13
+
+[Memory]
+               total        used        free      shared  buff/cache   available
+Mem:           7.7Gi       1.8Gi       3.0Gi        31Mi       3.1Gi       5.9Gi
+Swap:          2.0Gi          0B       2.0Gi
+
+[Disk usage]
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sdd       1007G  2.5G  954G   1% /
+Project   : 54M used by /home/askarov/devops/askarov-alisher-student-api
+
+[Available disk space]
+954G free on /
+-------------------- end of report -----------------
