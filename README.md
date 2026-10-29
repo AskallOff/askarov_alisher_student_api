@@ -30,9 +30,27 @@ Current stage: v1.0 - CRUD with group filter, documented by Alisher Askarov
   last name gives `400 Bad Request` instead of a database error.
 - Tests: `filterStudentsByGroup`, `unknownStudentGivesJson404`, `studentWithoutNameGives400`.
 
+## Run with Docker Compose
+
+```bash
+cp .env.example .env          # put a real POSTGRES_PASSWORD
+docker compose up -d          # api + db, http://localhost:8081
+docker compose ps
+docker compose down           # the volume askarov-alisher-pgdata keeps the data
+```
+
+Image: `askarov-alisher-student-api:v1.0-askarov-alisher` (multi-stage: JDK 21 for the build, JRE 21 Alpine at runtime).
+
+## CI/CD with Jenkins
+
+- Local Jenkins: `cd jenkins && cp .env.example .env && docker compose up -d --build`, then http://localhost:8091
+- Job `Askarov_Alisher_Student_API`: Checkout -> Build -> Test -> Docker Build -> Verify
+- GitHub is checked every 2 minutes (Poll SCM), the checkout uses the deploy key from Jenkins Credentials
+
 ## Project folders
 
 - `scripts/` - Bash script `Askarov_Alisher_system_report.sh`
 - `logs/` - system report log and log analysis
 - `backups/` - backup copy of this README
 - `src/` - Spring Boot application and tests
+- `jenkins/` - Dockerfile, plugins and Configuration as Code of the local Jenkins
