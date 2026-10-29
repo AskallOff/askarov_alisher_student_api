@@ -87,4 +87,20 @@ class StudentApiTests {
         mvc.perform(delete("/api/students/" + id)).andExpect(status().isNoContent());
         mvc.perform(get("/api/students/" + id)).andExpect(status().isNotFound());
     }
+
+    @Test
+    void unknownStudentGivesJson404() throws Exception {
+        mvc.perform(get("/api/students/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Student with id 999 not found"));
+    }
+
+    @Test
+    void studentWithoutNameGives400() throws Exception {
+        mvc.perform(post("/api/students").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"firstName\":\"\",\"groupName\":\"IT2-2304\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("firstName and lastName are required"));
+    }
 }

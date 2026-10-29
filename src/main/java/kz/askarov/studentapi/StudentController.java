@@ -35,39 +35,44 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Student> findOne(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Student findOne(@PathVariable Long id) {
+        return repository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
     }
 
     @PostMapping
     public ResponseEntity<Student> create(@RequestBody Student student) {
+        checkNames(student);
         student.setId(null);
         Student saved = repository.save(student);
         return ResponseEntity.created(URI.create("/api/students/" + saved.getId())).body(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Student> update(@PathVariable Long id, @RequestBody Student data) {
-        return repository.findById(id)
-                .map(student -> {
-                    student.setFirstName(data.getFirstName());
-                    student.setLastName(data.getLastName());
-                    student.setEmail(data.getEmail());
-                    student.setGroupName(data.getGroupName());
-                    student.setCourse(data.getCourse());
-                    return ResponseEntity.ok(repository.save(student));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public Student update(@PathVariable Long id, @RequestBody Student data) {
+        checkNames(data);
+        Student student = repository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
+        student.setFirstName(data.getFirstName());
+        student.setLastName(data.getLastName());
+        student.setEmail(data.getEmail());
+        student.setGroupName(data.getGroupName());
+        student.setCourse(data.getCourse());
+        return repository.save(student);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!repository.existsById(id)) {
-            return ResponseEntity.notFound().build();
+            throw new StudentNotFoundException(id);
         }
         repository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // first and last name are required (NOT NULL columns), otherwise 400 Bad Request
+    private static void checkNames(Student student) {
+        if (student.getFirstName() == null || student.getFirstName().isBlank()
+                || student.getLastName() == null || student.getLastName().isBlank()) {
+            throw new IllegalArgumentException("firstName and lastName are required");
+        }
     }
 }
