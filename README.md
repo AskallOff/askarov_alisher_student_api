@@ -3,7 +3,7 @@
 Student API of **Alisher Askarov** (group IT2-2304, student ID 38226).
 DevOps midterm: Linux, Git, Docker Compose and Jenkins around a Spring Boot CRUD application.
 
-Current stage: v1.0 - CRUD with group filter
+Current stage: v1.0 - CRUD with group filter, documented by Alisher Askarov
 
 ## Technologies
 
