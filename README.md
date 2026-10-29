@@ -15,10 +15,20 @@ Current stage: development
 
 - `GET /` - application info and student name
 - `GET /api/students` - all students
+- `GET /api/students?group=IT2-2304` - students of one group (sorted by last name)
 - `GET /api/students/{id}` - one student
 - `POST /api/students` - create a student
 - `PUT /api/students/{id}` - update a student
 - `DELETE /api/students/{id}` - delete a student
+
+## Changes by Alisher Askarov (branch feature/askarov-alisher-crud)
+
+- Read operation improved: `GET /api/students` can filter by group with `?group=`,
+  the group is compared without case and the result is sorted by last name.
+- Errors are returned as JSON: an unknown id gives `404` with the message
+  `Student with id ... not found` (GET, PUT, DELETE), a student without first or
+  last name gives `400 Bad Request` instead of a database error.
+- Tests: `filterStudentsByGroup`, `unknownStudentGivesJson404`, `studentWithoutNameGives400`.
 
 ## Project folders
 
