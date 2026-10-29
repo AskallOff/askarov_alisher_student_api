@@ -8,11 +8,13 @@ WORKDIR /workspace
 # build files first - this layer (Gradle + dependencies) is reused until build.gradle changes
 COPY gradlew settings.gradle build.gradle ./
 COPY gradle gradle
-RUN chmod +x gradlew && ./gradlew --no-daemon -q dependencies > /dev/null
+# BuildKit cache mount: Gradle and the libraries are downloaded once and kept between builds
+# (also between the builds started by Jenkins), so a build does not need the internet every time
+RUN --mount=type=cache,target=/root/.gradle chmod +x gradlew && ./gradlew --no-daemon -q dependencies > /dev/null
 
 COPY src src
 # tests are run by Jenkins in a separate stage, here only the JAR is built
-RUN ./gradlew --no-daemon bootJar -x test
+RUN --mount=type=cache,target=/root/.gradle ./gradlew --no-daemon bootJar -x test
 
 # ===== 2. runtime: only the Java runtime (JRE) and the JAR =====
 FROM eclipse-temurin:21-jre-alpine AS runtime
