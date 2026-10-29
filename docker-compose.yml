@@ -1,0 +1,52 @@
+# Alisher Askarov - Student API (Spring Boot) + PostgreSQL
+#   docker compose up -d        start      http://localhost:8081
+#   docker compose down         stop (the database volume stays)
+# Values like ${POSTGRES_PASSWORD} come from the .env file (copy .env.example)
+name: askarov-alisher-student-api
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: askarov-alisher-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      # $$ - the variable is read inside the container, not by Compose
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  api:
+    build: .
+    image: askarov-alisher-student-api:v1.0-askarov-alisher
+    container_name: askarov-alisher-api
+    environment:
+      # "db" is the service name above, Docker DNS turns it into the IP of the database container
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "8081:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+    name: askarov-alisher-pgdata
+
+networks:
+  backend:
+    name: askarov-alisher-net

@@ -1,0 +1,10 @@
+# Only gradle files and src/ are needed to build the image
+.git
+.gradle
+build
+backups
+logs
+scripts
+jenkins
+.env
+*.md
