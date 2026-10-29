@@ -70,6 +70,18 @@ class StudentApiTests {
     }
 
     @Test
+    void filterStudentsByGroup() throws Exception {
+        createAlisher();
+        mvc.perform(post("/api/students").contentType(MediaType.APPLICATION_JSON)
+                .content(ALISHER.replace("IT2-2304", "SE-2301").replace("Askarov", "Other")));
+
+        mvc.perform(get("/api/students").param("group", "it2-2304"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].lastName").value("Askarov"));
+    }
+
+    @Test
     void deleteStudent() throws Exception {
         long id = createAlisher();
         mvc.perform(delete("/api/students/" + id)).andExpect(status().isNoContent());

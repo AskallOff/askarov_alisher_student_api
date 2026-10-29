@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,8 +25,12 @@ public class StudentController {
         this.repository = repository;
     }
 
+    // GET /api/students - all students, GET /api/students?group=IT2-2304 - only one group
     @GetMapping
-    public List<Student> findAll() {
+    public List<Student> findAll(@RequestParam(required = false) String group) {
+        if (group != null && !group.isBlank()) {
+            return repository.findByGroupNameIgnoreCaseOrderByLastNameAsc(group.trim());
+        }
         return repository.findAll(Sort.by("id"));
     }
 
